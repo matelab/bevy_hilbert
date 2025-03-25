@@ -44,8 +44,9 @@
             renderdoc
           ];
           build-deps = with pkgs; [
-            pkgconfig
+            pkg-config
             mold
+            lld
             clang
             makeWrapper
           ];
@@ -58,6 +59,7 @@
             xorg.libXi
             xorg.libxcb
             libGL
+            libxkbcommon
             vulkan-loader
             vulkan-headers
           ];

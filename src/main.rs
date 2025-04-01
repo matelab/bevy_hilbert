@@ -12,12 +12,13 @@ mod moore;
 use hilbert::Hilbert;
 use moore::Moore;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 struct Traveller {
     position: f32,
     destination: f32,
     speed: f32,
     acceleration: f32,
+    still_since: f32,
 }
 
 #[derive(Component)]
@@ -104,6 +105,7 @@ fn setup_scene(
                     acceleration: 0.5,
                     destination: i as f32,
                     speed: 2.0 + dist.sample(&mut rng),
+                    still_since: 0.0,
                 },
                 Transform {
                     translation: pos,
@@ -156,7 +158,7 @@ fn setup_scene(
         commands.spawn(Mover {
             t_last: 0.,
             pos: cur,
-            direction: -8.,
+            direction: -4.,
             it: 0.05,
         });
         cur += dist;
@@ -183,7 +185,16 @@ fn simple_move(mut trvs: Query<&mut Traveller>, time: Res<Time<Real>>) {
         let d = Vec2::new(trv.destination, 0.);
         let dt = time.delta_secs();
         let dist = trv.speed * dt;
+        let old = trv.position;
         trv.position = s.move_towards(d, dist).x;
+        if (old - trv.position).abs() < 1e-3 {
+            trv.still_since += dt;
+        } else {
+            trv.still_since = 0.0;
+        }
+        if (trv.still_since > 60.0) {
+            println!("STUCK! {:?}", trv);
+        }
     }
 }
 
@@ -261,8 +272,11 @@ fn movers(
             for mut trv in trvs.iter_mut() {
                 let trv_pos = ((trv.position % l) + l) % l;
                 let mvr_pos = ((mvr.pos % l) + l) % l;
+                let mvr_pos_plus_dir = (((mvr.pos + mvr.direction) % l) + l) % l;
                 if ((mvr_pos <= trv_pos) && (trv_pos <= mvr_pos + mvr.direction))
                     || ((mvr_pos + mvr.direction <= trv_pos) && (trv_pos <= mvr_pos))
+                    || ((mvr_pos + mvr.direction <= trv_pos - sfc.total_size as f32)
+                        && (trv_pos - sfc.total_size as f32 <= mvr_pos))
                 {
                     trv.destination += 4.;
                 }

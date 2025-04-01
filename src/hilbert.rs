@@ -83,7 +83,6 @@ impl GridTurtle {
         self.x += x_off;
         self.y += y_off;
         let (x, y) = (self.x, self.y);
-        println!("Turtle at {x}, {y}");
     }
 
     pub fn pos(&self) -> (i32, i32) {

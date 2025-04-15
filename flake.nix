@@ -14,7 +14,7 @@
         "x86_64-linux"
       ];
       overlays = [ (import rust-overlay) ];
-      program_name = "bevy_circles";
+      program_name = "bevy_hilbert";
     in
     builtins.foldl'
       (outputs: system:
@@ -88,10 +88,8 @@
                   overrideMain = attrs: {
                     fixupPhase = ''
                       wrapProgram $out/bin/${program_name} \
-                        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath runtime-deps} \
-                        --set CARGO_MANIFEST_DIR $out/share/bevy_circles
-                      mkdir -p $out/share/${program_name}
-                      cp -a assets $out/share/${program_name}'';
+                        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath runtime-deps}
+                    '';
                     patchPhase = ''
                       sed -i s/\"dynamic\"// Cargo.toml
                     '';

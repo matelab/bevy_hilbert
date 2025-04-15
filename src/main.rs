@@ -104,7 +104,7 @@ fn setup_scene(
                     position: i as f32,
                     acceleration: 0.5,
                     destination: i as f32,
-                    speed: 2.0 + dist.sample(&mut rng),
+                    speed: 2.0,// + dist.sample(&mut rng),
                     still_since: 0.0,
                 },
                 Transform {
